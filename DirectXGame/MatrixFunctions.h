@@ -14,6 +14,8 @@ public:
 	Matrix4x4 Inverse(const Matrix4x4& m);
 	Matrix4x4 Transpose(const Matrix4x4& m);
 	Matrix4x4 MakeIdentity();
+	
+	Vector3 Transform(Vector3 point, Matrix4x4 trasformMatrix);
 
 private:
 };

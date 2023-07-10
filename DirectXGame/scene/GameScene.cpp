@@ -55,7 +55,7 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 	UpdateEnemyPopCommands();
-	player_->Update();
+	player_->Update(viewPlojection_);
 	/*enemy_->Update();*/
 	for (Enemy* enemy_ : enemys_) {
 		enemy_->Update();
@@ -145,6 +145,7 @@ void GameScene::Draw() {
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
 
+	player_->DrawUI();
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>

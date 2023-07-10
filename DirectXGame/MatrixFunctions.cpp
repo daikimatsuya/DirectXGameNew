@@ -231,3 +231,22 @@ Matrix4x4 MatrixFunctions::MakeIdentity() {
 	}
 	return tmp;
 }
+
+Vector3 MatrixFunctions::Transform(Vector3 point, Matrix4x4 trasformMatrix) {
+	Vector4 tmp{point.x, point.y, point.z, 1};
+	Vector3 tmp2{
+
+	};
+	float w = tmp.x * trasformMatrix.m[0][3] +
+	          tmp.y * trasformMatrix.m[1][3] +
+	          tmp.z * trasformMatrix.m[2][3] +
+	          tmp.w * trasformMatrix.m[3][3];
+
+	tmp2.x = (tmp.x * trasformMatrix.m[0][0] + tmp.y * trasformMatrix.m[1][0] + tmp.z * trasformMatrix.m[2][0] +  tmp.w * trasformMatrix.m[3][0]) / w;
+
+	tmp2.y = (tmp.x * trasformMatrix.m[0][1] + tmp.y * trasformMatrix.m[1][1] + tmp.z * trasformMatrix.m[2][1] + tmp.w * trasformMatrix.m[3][1]) /  w;
+
+	tmp2.z = (tmp.x * trasformMatrix.m[0][2] + tmp.y * trasformMatrix.m[1][2] + tmp.z * trasformMatrix.m[2][2] + tmp.w * trasformMatrix.m[3][2]) / w;
+
+	return tmp2;
+}

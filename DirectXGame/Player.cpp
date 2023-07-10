@@ -10,6 +10,7 @@ Player::Player() {}
 Player::~Player() {
 	for (PlayerBullet* bullet : bullets_) {
 		delete bullet;
+		delete sprite2DReticle_;
 	}
 }
 
@@ -22,9 +23,13 @@ void Player::Initialize(Model* model, uint32_t tectureHandle, Vector3 position) 
 	worldTrasform_.translation_ = position;
 	// viewProjection_.Initialize();
 	input_ = Input::GetInstance();
+	uint32_t textureReticle_ = TextureManager::Load("picture/spikeneedle.png");
+	sprite2DReticle_ =
+	    Sprite::Create(textureReticle_, {400, 400}, {0xff, 0xff, 0xff, 0xff}, {0.5f, 0.5f});
 }
 
-void Player::Update() {
+void Player::Update(const ViewProjection& viewProjection) {
+
 
 	worldTrasform_.TransferMatrix();
 	Vector3 move = {0, 0, 0};
@@ -72,6 +77,18 @@ void Player::Update() {
 	offset = VF_->Multiply(VF_->Normalize(offset), kDistancePlayerTo3DReticle);
 	worldTransform3DReticle_.translation_ = VF_->Add(GetWorldPosition(), offset);
 	worldTransform3DReticle_.UpdateMatrix();
+
+	Vector3 positionReticle = {
+	    worldTransform3DReticle_.matWorld_.m[3][0],
+		worldTransform3DReticle_.matWorld_.m[3][1],
+	    worldTransform3DReticle_.matWorld_.m[3][2]
+	};
+	Matrix4x4 matViewport =
+	    RPF_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+	Matrix4x4 matViewProjectionViewPort = MF_->Multiply(
+	    viewProjection.matView, MF_->Multiply(viewProjection.matProjection, matViewport));
+	positionReticle = MF_->Transform(positionReticle, matViewProjectionViewPort);
+	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
 
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->Isdead()) {
@@ -125,3 +142,5 @@ Vector3 Player::GetWorldPosition() {
 }
 
 void Player::Setparent(const WorldTransform* parent) { worldTrasform_.parent_ = parent; }
+
+void Player::DrawUI() { sprite2DReticle_->Draw(); }
