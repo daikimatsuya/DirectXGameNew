@@ -5,11 +5,11 @@ class Skydome {
 public:
 	void Initialize(Model* model, uint32_t textureHandle);
 	void Update();
-	void Draw(ViewProjection viewProjection);
+	void Draw(const ViewProjection& viewProjection);
 
 private:
 	WorldTransform worldTransform_;
-	ViewProjection viewProjection_;
 	Model* model_ = nullptr;
 	uint32_t textureHandle_ = 0;
+	float size_;
 };
