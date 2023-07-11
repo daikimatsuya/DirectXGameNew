@@ -1,2 +1,9 @@
 #pragma once
-class EnemyBullet {};
+class EnemyBullet {
+	EnemyBullet();
+	~EnemyBullet();
+
+	void Initialize();
+	void Update();
+	void Draw();
+};

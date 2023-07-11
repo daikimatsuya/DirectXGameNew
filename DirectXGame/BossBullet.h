@@ -1,2 +1,9 @@
 #pragma once
-class BossBullet {};
+class BossBullet {
+	BossBullet();
+	~BossBullet();
+
+	void Initialize();
+	void Update();
+	void Draw();
+};

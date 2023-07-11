@@ -1,2 +1,9 @@
 #pragma once
-class Player {};
+class Player {
+	Player();
+	~Player();
+
+	void Initialize();
+	void Update();
+	void Draw();
+};

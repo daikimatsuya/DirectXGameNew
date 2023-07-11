@@ -1,2 +1,9 @@
 #pragma once
-class PlayerBullet {};
+class PlayerBullet {
+	PlayerBullet();
+	~PlayerBullet();
+
+	void Initialize();
+	void Update();
+	void Draw();
+};

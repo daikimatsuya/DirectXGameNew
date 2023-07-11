@@ -1,2 +1,9 @@
 #pragma once
-class Skydome {};
+class Skydome {
+	Skydome();
+	~Skydome();
+
+	void Initialize();
+	void Update();
+	void Draw();
+};
