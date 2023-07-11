@@ -25,7 +25,7 @@ void Player::Initialize(Model* model, uint32_t tectureHandle, Vector3 position) 
 	input_ = Input::GetInstance();
 	uint32_t textureReticle_ = TextureManager::Load("picture/spikeneedle.png");
 	sprite2DReticle_ =
-	    Sprite::Create(textureReticle_, {400, 400}, {0xff, 0xff, 0xff, 0xff}, {0.5f, 0.5f});
+	    Sprite::Create(textureReticle_, {1280/2, 720/2}, {0xff, 0xff, 0xff, 0xff}, {0.5f, 0.5f});
 }
 
 void Player::Update(const ViewProjection& viewProjection) {
@@ -85,7 +85,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 	//worldTransform3DReticle_.translation_ = VF_->Add(GetWorldPosition(), offset);
 	//worldTransform3DReticle_.UpdateMatrix();
 
-	////2Dレティクル
+	//2Dレティクル
 	//Vector3 positionReticle = {
 	//    worldTransform3DReticle_.matWorld_.m[3][0],
 	//	worldTransform3DReticle_.matWorld_.m[3][1],
@@ -100,26 +100,30 @@ void Player::Update(const ViewProjection& viewProjection) {
 
 	//レティクル->マウス->コントローラー
 
-	/*Vector2 spritePosition = sprite2DReticle_->GetPosition();
+	Vector2 spritePosition = sprite2DReticle_->GetPosition();
 	
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		spritePosition.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 5.0f;
 		spritePosition.y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 5.0f;
 		sprite2DReticle_->SetPosition(spritePosition);
-	}*/
+	}
 
-	POINT mousePosition;
-	GetCursorPos(&mousePosition);
-	HWND hwnd = WinApp::GetInstance()->GetHwnd();
-	ScreenToClient(hwnd, &mousePosition);
+	/*POINT mousePosition;*/
+	/*GetCursorPos(&mousePosition);*/
+
+	/*HWND hwnd = WinApp::GetInstance()->GetHwnd();*/
+	//ScreenToClient(hwnd, &mousePosition);
 	/*sprite2DReticle_->SetPosition(Vector2(float(mousePosition.x), float(mousePosition.y)));*/
 	 Matrix4x4 matViewport =
 	     RPF_->MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
 	Matrix4x4 matVPV = MF_->Multiply(
 	    viewProjection.matView, MF_->Multiply(viewProjection.matProjection, matViewport));
 	Matrix4x4 matInverseVPV = MF_->Inverse(matVPV);
-	Vector3 posNear = Vector3(float(mousePosition.x), float(mousePosition.y), 0);
-	Vector3 posFar = Vector3(float(mousePosition.x), float(mousePosition.y), 1);
+	//Vector3 posNear = Vector3(float(mousePosition.x), float(mousePosition.y), 0);
+	//Vector3 posFar = Vector3(float(mousePosition.x), float(mousePosition.y), 1);
+
+	Vector3 posNear = Vector3( float(sprite2DReticle_->GetPosition().x), float(sprite2DReticle_->GetPosition().y), 0);
+	Vector3 posFar = Vector3(float(sprite2DReticle_->GetPosition().x), float(sprite2DReticle_->GetPosition().y), 1);
 	posNear = MF_->Transform(posNear, matInverseVPV);
 	posFar = MF_->Transform(posFar, matInverseVPV);
 
@@ -128,7 +132,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 	const float kDistanceTestObject = kDistancePlayerTo3DReticle;
 	worldTransform3DReticle_.translation_ =
 	    VF_->Add(posNear, VF_->Multiply(mouseDirection, kDistanceTestObject));
-	/*worldTransform3DReticle_.UpdateMatrix();*/
+	worldTransform3DReticle_.UpdateMatrix();
 
 
 	bullets_.remove_if([](PlayerBullet* bullet) {
