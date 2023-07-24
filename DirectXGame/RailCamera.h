@@ -1,9 +1,23 @@
 #pragma once
-class RailCamera {
-	RailCamera();
-	~RailCamera();
+#include "WorldTransform.h"
+#include "AffineMatrixFunctions.h"
+#include "input.h"
+#include "MatrixFunctions.h"
+#include "ViewProjection.h"
 
-	void Initialize();
+class RailCamera {
+public:
+	void Initialize(WorldTransform worldTransform);
 	void Update();
-	void Draw();
+	const ViewProjection& GetViewProjection() { return viewProjection_; };
+	const WorldTransform& GetWorldTransform() { return worldTransform_; };
+
+private:
+	WorldTransform worldTransform_;
+	ViewProjection viewProjection_;
+	AffineMatrixFunctions amf_;
+	MatrixFunctions mf_;
+	Input* input_ = nullptr;
+	Vector3 velocity_ = {};
+	Vector3 rotate_ = {};
 };
