@@ -175,6 +175,7 @@ void Player::Attack() {
 	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
 		return;
 	}
+
 	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) || input_->TriggerKey(DIK_Z)) {
 		const float kBulletSpeed = 1.0f;
 		Vector3 velocity = VF_->Subtract(worldTransform3DReticle_.translation_, GetWorldPosition());

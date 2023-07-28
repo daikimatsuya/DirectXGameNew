@@ -3,6 +3,7 @@
 
 void RailCamera::Initialize() { 
 	input_ = Input::GetInstance();
+	worldTransform_.Initialize();
 	viewProjection_.Initialize();
 	velocity_ = {};
 	rotate_ = {};
