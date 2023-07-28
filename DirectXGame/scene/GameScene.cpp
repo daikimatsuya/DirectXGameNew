@@ -25,7 +25,7 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize() {
 	LoadEnemyPopData();
-	worldTransform_.Initialize();
+	
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
@@ -34,7 +34,7 @@ void GameScene::Initialize() {
 	intervalTimer = 60;
 	skydome_ = new Skydome();
 	railCamera_ = new RailCamera();
-	player_->SetParent(&railCamera_->GetWorldTransform());
+	player_->Setparent(&railCamera_->GetWorldTransform());
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	/*enemy_->SetPlayer(player_);*/
 	model_ = Model::Create();
@@ -47,7 +47,7 @@ void GameScene::Initialize() {
 	/*enemy_->Initialize(model_, textureHandleEnemy_, {20,5,50});*/
 	/*enemy_->SetGameScene(this);*/
 	skydome_->Initialize(modelSkydome_, textureHandleSkydome_);
-	railCamera_->Initialize(worldTransform_);
+	railCamera_->Initialize();
 	debugCamera_ = new DebugCamera(1280, 720);
 	AxisIndicator::GetInstance()->SetVisible(true);
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewPlojection_);

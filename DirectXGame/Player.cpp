@@ -4,6 +4,8 @@
 #include "Input.h"
 #include "PlayerBullet.h"
 #include <cassert>
+#include <algorithm>
+#include "WinApp.h"
 
 Player::Player() {}
 
@@ -76,7 +78,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 
 	worldTrasform_.UpdateMatrix();
 
-	////3DƒŒƒeƒBƒNƒ‹
+	////3Dãƒ¬ãƒ†ã‚£ã‚¯ãƒ«
 	const float kDistancePlayerTo3DReticle = 70.0f;
 	// Vector3 offset = {0, 0, 0.1f};
 	// offset = MF_->TransformNormal(offset, worldTrasform_.matWorld_);
@@ -84,7 +86,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// worldTransform3DReticle_.translation_ = VF_->Add(GetWorldPosition(), offset);
 	// worldTransform3DReticle_.UpdateMatrix();
 
-	// 2DƒŒƒeƒBƒNƒ‹
+	// 2Dãƒ¬ãƒ†ã‚£ã‚¯ãƒ«
 	// Vector3 positionReticle = {
 	//     worldTransform3DReticle_.matWorld_.m[3][0],
 	//	worldTransform3DReticle_.matWorld_.m[3][1],
@@ -97,7 +99,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// positionReticle = MF_->Transform(positionReticle, matViewProjectionViewPort);
 	// sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
 
-	// ƒŒƒeƒBƒNƒ‹->ƒ}ƒEƒX->ƒRƒ“ƒgƒ[ƒ‰[
+	// ãƒ¬ãƒ†ã‚£ã‚¯ãƒ«->ãƒžã‚¦ã‚¹->ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼
 
 	Vector2 spritePosition = sprite2DReticle_->GetPosition();
 

@@ -69,7 +69,6 @@ private: // メンバ変数
 	uint32_t textureHandleSkydome_ = 0;
 	bool isDebugCameraActive_ = false;
 	DebugCamera* debugCamera_ = nullptr;
-	WorldTransform worldTransform_;
 	int intervalTimer;
 	bool waitFlag = false;
 	int32_t waitTimer;

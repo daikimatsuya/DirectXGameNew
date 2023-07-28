@@ -28,8 +28,8 @@ public:
 
 private:
 	// enum Phase {
-	//	Approach,	//Ú‹ß
-	//	Leave,		//—£’E
+	//	Approach,	//æ¥è¿‘
+	//	Leave,		//é›¢è„±
 	// };
 	WorldTransform worldTransform_;
 	Model* model_ = nullptr;

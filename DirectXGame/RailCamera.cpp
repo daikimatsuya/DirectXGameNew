@@ -1,10 +1,8 @@
 #include "RailCamera.h"
 
 
-void RailCamera::Initialize( WorldTransform worldTransform) { 
+void RailCamera::Initialize() { 
 	input_ = Input::GetInstance();
-	worldTransform_ = worldTransform;
-	rotate_ = worldTransform.rotation_;
 	viewProjection_.Initialize();
 	velocity_ = {};
 	rotate_ = {};
