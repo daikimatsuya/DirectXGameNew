@@ -24,6 +24,7 @@ public:
 	void OnCollision();
 	void Approach();
 	void Leave();
+	bool IsDead() { return isDead_; }
 	static const int kInterval = 60;
 
 private:
@@ -44,4 +45,6 @@ private:
 	uint32_t intervalTimer = 0;
 	static void (Enemy::*MovePhase[])();
 	int phase_ = 0;
+	int hp_;
+	bool isDead_;
 };

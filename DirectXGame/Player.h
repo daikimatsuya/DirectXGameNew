@@ -32,6 +32,7 @@ private:
 	Sprite* sprite2DReticle_ = nullptr;
 	// ViewProjection viewProjection_;
 	Model* model_ = nullptr;
+	Model* playerModel_ = nullptr;
 	uint32_t tectureHandle_ = 0u;
 	Input* input_ = nullptr;
 	AffineMatrixFunctions* AMF_ = nullptr;
@@ -40,4 +41,6 @@ private:
 	RenderingPipelineFunctions* RPF_ = nullptr;
 	std::list<PlayerBullet*> bullets_;
 	float inputFloat[3] = {};
+	int fireCoolTime;
+	float reticleoffset;
 };

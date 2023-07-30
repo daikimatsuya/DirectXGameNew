@@ -4,6 +4,7 @@
 #include "EnemyBullet.h"
 #include "ImGuiManager.h"
 #include "Player.h"
+#include "Boss.h"
 #include "TextureManager.h"
 #include "fstream"
 #include "sstream"
@@ -30,20 +31,24 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	player_ = new Player();
+	boss_ = new Boss();
 	/*enemy_ = new Enemy();*/
 	intervalTimer = 60;
 	skydome_ = new Skydome();
 	railCamera_ = new RailCamera();
 	player_->Setparent(&railCamera_->GetWorldTransform());
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+	
 	/*enemy_->SetPlayer(player_);*/
 	model_ = Model::Create();
 	viewPlojection_.Initialize();
-	textuerHandle_ = TextureManager::Load("picture/mario.png");
+	textuerHandle_ = TextureManager::Load("Player/Player.png");
 	textureHandleEnemy_ = TextureManager::Load("picture/enemy.png");
 	textureHandleSkydome_ = TextureManager::Load("skydome/OIP.jpg");
 	Vector3 playerPosition = {0, 0, 40};
+	Vector3 bossPosition = {3, 0, 100};
 	player_->Initialize(model_, textuerHandle_, playerPosition);
+	boss_->Initialize(model_, textureHandleEnemy_, bossPosition);
 	/*enemy_->Initialize(model_, textureHandleEnemy_, {20,5,50});*/
 	/*enemy_->SetGameScene(this);*/
 	skydome_->Initialize(modelSkydome_, textureHandleSkydome_);
@@ -56,6 +61,7 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	UpdateEnemyPopCommands();
 	player_->Update(viewPlojection_);
+	boss_->Update();
 	/*enemy_->Update();*/
 	for (Enemy* enemy_ : enemys_) {
 		enemy_->Update();
@@ -75,6 +81,13 @@ void GameScene::Update() {
 		}
 		intervalTimer = 60;
 	}
+	enemys_.remove_if([](Enemy* enemy) { 
+		if (enemy->IsDead()) {
+			delete enemy;
+			return true;
+		}
+		return false;
+	});
 	enemyBullets_.remove_if([](EnemyBullet* bullet) {
 		if (bullet->Isdead()) {
 			delete bullet;
@@ -131,6 +144,7 @@ void GameScene::Draw() {
 	/// </summary>
 	skydome_->Draw(viewPlojection_);
 	player_->Draw(viewPlojection_);
+	boss_->Draw(viewPlojection_);
 	for (Enemy* enemy_ : enemys_) {
 		enemy_->Draw(viewPlojection_);
 	}
@@ -161,7 +175,7 @@ void GameScene::GetAllColisions() {
 
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
 
-	posA = player_->GetWorldPosition();
+	posA = player_->GetWorldPosition(); // プレイヤーと敵の弾
 	for (EnemyBullet* bullet : enemyBullets_) {
 		posB = bullet->GetWorldPosition();
 		float length =
@@ -172,6 +186,19 @@ void GameScene::GetAllColisions() {
 			bullet->OnCollision();
 		}
 	}
+
+	posA = boss_->GetWorldPosition();
+	for (PlayerBullet* bullet : playerBullets) {
+		posB = bullet->GetWorldPos();
+		float length =
+		    ((posB.x - posA.x) * (posB.x - posA.x) + (posB.y - posA.y) * (posB.y - posA.y) +
+		     (posB.z - posA.z) * (posB.z - posA.z));
+		if (length < (1 + 5) * (1 + 5)) {
+			boss_->OnCollision();
+			bullet->OnCollision();
+		}
+	}
+	// 敵とプレイヤーの弾
 	for (Enemy* enemy_ : enemys_) {
 
 		posA = enemy_->GetWorldPosition();
@@ -181,12 +208,14 @@ void GameScene::GetAllColisions() {
 			    ((posB.x - posA.x) * (posB.x - posA.x) + (posB.y - posA.y) * (posB.y - posA.y) +
 			     (posB.z - posA.z) * (posB.z - posA.z));
 			if (length < (1 + 2) * (1 + 2)) {
-				// enemy_->OnCollision();
+				enemy_->OnCollision();
 				bullet->OnCollision();
 			}
 		}
 	}
 }
+
+
 
 void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) { enemyBullets_.push_back(enemyBullet); }
 
@@ -196,10 +225,11 @@ void GameScene::LoadEnemyPopData() {
 	assert(file.is_open());
 	enemyPopCommands << file.rdbuf();
 	file.close();
+	waitFlag = false;
 }
 
 void GameScene::UpdateEnemyPopCommands() {
-	;
+	
 	std::string line;
 	if (waitFlag != true) {
 		while (getline(enemyPopCommands, line)) {
@@ -254,3 +284,5 @@ void GameScene::CreateEnemy(Vector3 pos) {
 	newEnemy->SetPlayer(player_);
 	enemys_.push_back(newEnemy);
 }
+
+bool GameScene::GetSpawnEnd() { return isSpawn; }

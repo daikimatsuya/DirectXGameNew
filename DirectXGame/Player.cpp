@@ -6,6 +6,8 @@
 #include <cassert>
 #include <algorithm>
 #include "WinApp.h"
+#include "math.h"
+#include "Enemy.h"
 
 Player::Player() {}
 
@@ -19,6 +21,7 @@ Player::~Player() {
 void Player::Initialize(Model* model, uint32_t tectureHandle, Vector3 position) {
 	assert(model);
 	model_ = model;
+	playerModel_ = Model::CreateFromOBJ("Player", true);
 	tectureHandle_ = tectureHandle;
 	worldTrasform_.Initialize();
 	worldTransform3DReticle_.Initialize();
@@ -28,6 +31,9 @@ void Player::Initialize(Model* model, uint32_t tectureHandle, Vector3 position) 
 	uint32_t textureReticle_ = TextureManager::Load("picture/spikeneedle.png");
 	sprite2DReticle_ = Sprite::Create(
 	    textureReticle_, {1280 / 2, 720 / 2}, {0xff, 0xff, 0xff, 0xff}, {0.5f, 0.5f});
+	fireCoolTime = 0;
+	reticleoffset = 3;
+	worldTrasform_.rotation_.y = -1.5;
 }
 
 void Player::Update(const ViewProjection& viewProjection) {
@@ -63,9 +69,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 	const float MoveLimitY = 15;
 	Rotate();
 
-	ImGui::Begin("Player");
-	ImGui::SliderFloat3("Player", inputFloat, -100, 100);
-	ImGui::End();
+
 
 	worldTrasform_.translation_.x = inputFloat[0];
 	worldTrasform_.translation_.y = inputFloat[1];
@@ -151,40 +155,88 @@ void Player::Update(const ViewProjection& viewProjection) {
 }
 
 void Player::Draw(const ViewProjection& viewProjection) {
-	model_->Draw(worldTransform3DReticle_, viewProjection, tectureHandle_);
-	model_->Draw(worldTrasform_, viewProjection, tectureHandle_);
+	//model_->Draw(worldTransform3DReticle_, viewProjection, tectureHandle_);
+	playerModel_->Draw(worldTrasform_, viewProjection, tectureHandle_);
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
 }
 
 void Player::Rotate() {
-	const float KRotSpeed = 0.02f;
-	if (input_->PushKey(DIK_A)) {
-		worldTrasform_.rotation_.y += KRotSpeed;
+	const float KRotSpeed = 0.12f;
+	XINPUT_STATE joyState;
+	reticleoffset = 0;
+	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+
+		if (input_->PushKey(DIK_A)) {
+			worldTrasform_.rotation_.z += KRotSpeed;
+			reticleoffset = 3;
+		}
+		if (input_->PushKey(DIK_D)) {
+			worldTrasform_.rotation_.z -= KRotSpeed;
+			reticleoffset = 3;
+		}
+		return;
 	}
-	if (input_->PushKey(DIK_D)) {
-		worldTrasform_.rotation_.y -= KRotSpeed;
+	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) {
+		worldTrasform_.rotation_.z += KRotSpeed;
+		reticleoffset = 3;
 	}
+	
+
 }
 
 void Player::Attack() {
 
 	XINPUT_STATE joyState;
 
-	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
-		return;
-	}
+	if (fireCoolTime <= 0) {
+		Vector3 bulletReticleA_;
+		bulletReticleA_.x = worldTransform3DReticle_.translation_.x +
+		                    reticleoffset * sinf(worldTrasform_.rotation_.z);
+		bulletReticleA_.y = worldTransform3DReticle_.translation_.y +
+		                    reticleoffset * cosf(worldTrasform_.rotation_.z);
+		bulletReticleA_.z = worldTransform3DReticle_.translation_.z;
 
-	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) || input_->TriggerKey(DIK_Z)) {
-		const float kBulletSpeed = 1.0f;
-		Vector3 velocity = VF_->Subtract(worldTransform3DReticle_.translation_, GetWorldPosition());
-		velocity = VF_->Multiply(VF_->Normalize(velocity), kBulletSpeed);
-		// velocity = AMF_->TransformNormal(velocity, worldTrasform_.matWorld_);
-		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialize(model_, worldTrasform_.matWorld_, velocity);
-		bullets_.push_back(newBullet);
+		Vector3 bulletReticleB_;
+		bulletReticleB_.x = worldTransform3DReticle_.translation_.x +
+		                    reticleoffset * sinf(worldTrasform_.rotation_.z);
+		bulletReticleB_.y = worldTransform3DReticle_.translation_.y +
+		                    reticleoffset * cosf(worldTrasform_.rotation_.z);
+		bulletReticleB_.z = worldTransform3DReticle_.translation_.z;
+
+		fireCoolTime = (int)(60 * 0.2f);
+		if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+			if (input_->PushKey(DIK_Z)) {
+				const float kBulletSpeed = 1.0f;
+				Vector3 velocityA = VF_->Subtract(bulletReticleA_, GetWorldPosition());
+				Vector3 velocityB = VF_->Subtract(bulletReticleB_, GetWorldPosition());
+				velocityA = VF_->Multiply(VF_->Normalize(velocityA), kBulletSpeed);
+				velocityB = VF_->Multiply(VF_->Normalize(velocityB), kBulletSpeed);
+				// velocity = AMF_->TransformNormal(velocity, worldTrasform_.matWorld_);
+				PlayerBullet* newBullet = new PlayerBullet();
+				newBullet->Initialize(model_, worldTrasform_.matWorld_, velocityA);
+				newBullet->Initialize(model_, worldTrasform_.matWorld_, velocityB);
+				bullets_.push_back(newBullet);
+			}
+			return;
+		}
+		
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) || input_->PushKey(DIK_Z)) {
+			const float kBulletSpeed = 1.0f;
+			Vector3 velocityA = VF_->Subtract(bulletReticleA_, GetWorldPosition());
+			Vector3 velocityB = VF_->Subtract(bulletReticleB_, GetWorldPosition());
+			velocityA = VF_->Multiply(VF_->Normalize(velocityA), kBulletSpeed);
+			velocityB = VF_->Multiply(VF_->Normalize(velocityB), kBulletSpeed);
+			// velocity = AMF_->TransformNormal(velocity, worldTrasform_.matWorld_);
+			PlayerBullet* newBullet = new PlayerBullet();
+			newBullet->Initialize(model_, worldTrasform_.matWorld_, velocityA);
+			newBullet->Initialize(model_, worldTrasform_.matWorld_, velocityB);
+			bullets_.push_back(newBullet);
+		}
+	
 	}
+	fireCoolTime--;
 }
 
 Vector3 Player::GetWorldPosition() {

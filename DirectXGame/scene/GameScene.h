@@ -14,6 +14,7 @@
 class Enemy;
 class Player;
 class EnemyBullet;
+class Boss;
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -52,17 +53,21 @@ public: // メンバ関数
 	void LoadEnemyPopData();
 	void UpdateEnemyPopCommands();
 	void CreateEnemy(Vector3 pos);
+	bool GetSpawnEnd();
 
 private: // メンバ変数
+	bool isSpawn = false;
 	DirectXCommon* dxCommon_ = nullptr;
 	ViewProjection viewPlojection_;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 	Player* player_ = nullptr;
+	Boss *boss_=nullptr;
 	Skydome* skydome_ = nullptr;
 	RailCamera* railCamera_ = nullptr;
 	Model* model_ = nullptr;
 	Model* modelSkydome_ = nullptr;
+	Model* modelPlayer_ = nullptr;
 	// Enemy* enemy_=nullptr;
 	uint32_t textuerHandle_ = 0;
 	uint32_t textureHandleEnemy_ = 0;

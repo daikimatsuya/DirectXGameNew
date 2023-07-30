@@ -18,6 +18,7 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle, Vector3 pos) {
 	AproachVelocity_ = {0, 0, -0.2f};
 	LeaveVelocity_ = {0.0f, 0.0f, +0.2f};
 	InitializeBulletPhase();
+	hp_ = 6;
 }
 void (Enemy::*Enemy::MovePhase[])() = {
     &Enemy::Approach,
@@ -82,6 +83,13 @@ void Enemy::Leave() {
 	worldTransform_.translation_ = tmp2;
 	if (worldTransform_.translation_.z > 50.0f) {
 		phase_ = 0;
+	}
+}
+
+void Enemy::OnCollision() { 
+	hp_--;
+	if (hp_ <= 0) {
+		isDead_ = true;
 	}
 }
 
